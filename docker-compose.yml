@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   sonarqube:
-    image: sonarqube:7.9-community 
+    image: sonarqube:8.2-community 
     container_name: sonarqube
     depends_on:
       - pgsql
@@ -14,6 +14,7 @@ services:
       - ./sonarqube/opt/sonarqube/data:/opt/sonarqube/data
       - ./sonarqube/opt/sonarqube/logs:/opt/sonarqube/logs
       - ./sonarqube/opt/sonarqube/extensions:/opt/sonarqube/extensions
+      - ./sonarqube/opt/sonarqube/conf/sonar.properties:/opt/sonarqube/conf/sonar.properties
   pgsql:
     image: postgres:11
     container_name: pgsql11

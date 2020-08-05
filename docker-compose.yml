@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   sonarqube:
-    image: sonarqube:8.2-community 
+    image: sonarqube:8.4.1-community
     container_name: sonarqube
     depends_on:
       - pgsql
@@ -21,6 +21,7 @@ services:
     environment:
       - POSTGRES_DB=sonar
       - POSTGRES_USER=sonar
+      - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
       - ./pgsql/var/lib/postgresql/data:/var/lib/postgresql/data
       - ./pgsql/backup:/backup

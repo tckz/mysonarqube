@@ -46,7 +46,7 @@ jobs:
           echo "value=$(echo "${{ needs.set-env.outputs.target_hosts }}" | jq -R 'split(",")' | jq -c)" >> $GITHUB_OUTPUT
 
   deploy:
-    needs: [gen-matrix]
+    needs: [gen-matrix,set-env]
     strategy:
       max-parallel: 1
       fail-fast: true

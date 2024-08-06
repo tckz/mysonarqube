@@ -81,3 +81,8 @@ jobs:
       - name: deploy to ${{ needs.set-env.outputs.deploy_env }} on ${{ matrix.host }}
         run: |
           BRANCH="${{ vars.BRANCH }}" ENV="${{ vars.ENV }}" ./deploy.sh
+          exit 1
+      - name: error notification
+        if: failure()
+        run: |
+          echo "Deploy failed on ${{ matrix.host }}"

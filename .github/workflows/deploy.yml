@@ -87,6 +87,5 @@ jobs:
         uses: ./.github/actions/notify-teams
         with:
           text: |
-            Deploy ${{ github.repository }} failed on ${{ matrix.host }}
-            [${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            Failed to deploy ${{ github.repository }} on ${{ matrix.host }}
           webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}

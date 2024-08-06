@@ -15,7 +15,9 @@ runs:
     - name: Notify message
       shell: bash
       run: |
-        curl -v -H "Content-Type: application/json" -d "$(echo x | jq -R --arg t "${{ inputs.text }}" '{
+        url="[${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+
+        curl -v -H "Content-Type: application/json" -d "$(echo x | jq -R --arg t "${{ inputs.text }}" --arg url "$url" '{
           "attachments": [
             {
               "contentType": "application/vnd.microsoft.card.adaptive",
@@ -27,6 +29,12 @@ runs:
                   {
                     "type": "TextBlock",
                     "text": $t,
+                    "wrap": true,
+                    "markdown": true
+                  },
+                  {
+                    "type": "TextBlock",
+                    "text": $url,
                     "wrap": true,
                     "markdown": true
                   }

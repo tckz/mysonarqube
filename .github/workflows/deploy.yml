@@ -1,8 +1,11 @@
 name: Deploy
 on:
-  # workflow_dispatchはデフォルトブランチに置くまで使えないので開発中の便宜
   push:
     branches:
+      - develop
+      - staging
+      - master
+      # workflow_dispatchはデフォルトブランチに置くまで使えないので開発中の便宜
       - check-deploy-dev
   workflow_dispatch:
     inputs:
@@ -22,12 +25,27 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
-      deploy_env: ${{ github.event.inputs.env || 'prd' }}
+      deploy_env: ${{ steps.choose-env.outputs.value }}
     steps:
-      # 特にすることはないがsteps必須のため
-      - name: dummy
+      - name: choose-env
+        id: choose-env
         run: |
-          :
+          if [[ -n "${{ github.event.inputs.env }}" ]]
+          then
+            echo "value=${{ github.event.inputs.env }}" >> $GITHUB_OUTPUT
+          else
+            case "$GITHUB_REF_NAME" in
+              staging)
+                echo "value=stg" >> $GITHUB_OUTPUT
+                ;;
+              master)
+                echo "value=prd" >> $GITHUB_OUTPUT
+                ;;
+              *)
+                echo "value=dev" >> $GITHUB_OUTPUT
+                ;;
+            esac
+          fi
 
   gen-matrix:
     needs: [set-env]
@@ -39,7 +57,8 @@ jobs:
     outputs:
       matrix: ${{ steps.gen-matrix.outputs.value }}
     steps:
-      - id: gen-matrix
+      - name: gen-matrix
+        id: gen-matrix
         run: |
           echo "value=$(echo "${{ vars.TARGET_HOSTS }}" | jq -R '{"host": split(",")}' | jq -c)" >> $GITHUB_OUTPUT
 

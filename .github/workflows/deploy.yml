@@ -43,7 +43,7 @@ jobs:
     steps:
       - id: gen-matrix
         run: |
-            echo "value=$(echo "${{ needs.set-env.outputs.target_hosts }}" | jq -R '{host: split(",")}')" >> $GITHUB_OUTPUT
+          echo "value=$(echo "${{ needs.set-env.outputs.target_hosts }}" | jq -R '{host: split(",")}')" >> $GITHUB_OUTPUT
 
   deploy:
     needs: [gen-matrix]
@@ -51,7 +51,7 @@ jobs:
       max-parallel: 1
       fail-fast: true
       matrix: ${{ fromJson(needs.gen-matrix.outputs.matrix) }}
-    runs-on: {{ matrix.host }}
+    runs-on: ${{ matrix.host }}
     concurrency:
       group: ${{ needs.set-env.outputs.deploy_env }}
       cancel-in-progress: false

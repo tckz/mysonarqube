@@ -1,0 +1,38 @@
+name: "Notify Teams"
+description: "Notify Teams"
+
+inputs:
+  text:
+    description: "Content"
+    required: true
+  webhook-url:
+    description: "Webhook URL"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Notify message
+      shell: bash
+      run: |
+        curl -v -H "Content-Type: application/json" -d "$(echo x | jq -R --arg t "${{ inputs.text }}" '{
+          "attachments": [
+            {
+              "contentType": "application/vnd.microsoft.card.adaptive",
+              "content": {
+                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                "type": "AdaptiveCard",
+                "version": "1.4",
+                "body": [
+                  {
+                    "type": "TextBlock",
+                    "text": $t,
+                    "wrap": true,
+                    "markdown": true
+                  }
+                ]
+              }
+            }
+          ]
+        }')" "${{ inputs.webhook-url }}"
+

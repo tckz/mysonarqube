@@ -39,18 +39,19 @@ jobs:
       # environment.nameで使えるcontextが限定されているのとデフォルトブランチに置くまでworkflow_dispatchが使えないことに起因する回避
       name: ${{ needs.set-env.outputs.deploy_env }}
     outputs:
-      matrix: ${{ steps.gen-matrix.outputs.value }}
+      host: ${{ steps.gen-matrix.outputs.value }}
     steps:
       - id: gen-matrix
         run: |
-          echo "value=$(echo "${{ needs.set-env.outputs.target_hosts }}" | jq -R '{host: split(",")}' | jq -c | jq -R .)" >> $GITHUB_OUTPUT
+          echo "value=$(echo "${{ needs.set-env.outputs.target_hosts }}" | jq -R 'split(",")' | jq -c | jq -R .)" >> $GITHUB_OUTPUT
 
   deploy:
     needs: [gen-matrix]
     strategy:
       max-parallel: 1
       fail-fast: true
-      matrix: ${{ fromJson(needs.gen-matrix.outputs.matrix) }}
+      matrix:
+        host: ${{ fromJson(needs.gen-matrix.outputs.host) }}
     runs-on: ${{ matrix.host }}
     concurrency:
       group: ${{ needs.set-env.outputs.deploy_env }}

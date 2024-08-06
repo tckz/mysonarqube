@@ -43,7 +43,7 @@ jobs:
     steps:
       - id: gen-matrix
         run: |
-          echo "value=$(echo "${{ needs.set-env.outputs.target_hosts }}" | jq -R '{host: split(",")}')" >> $GITHUB_OUTPUT
+          echo "value=$(echo "${{ needs.set-env.outputs.target_hosts }}" | jq -R '{host: split(",")}' | jq -c | jq -R .)" >> $GITHUB_OUTPUT
 
   deploy:
     needs: [gen-matrix]

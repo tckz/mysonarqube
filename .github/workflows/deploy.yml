@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
-      deploy_env: ${{ github.event.inputs.env || 'dev' }}
+      deploy_env: ${{ github.event.inputs.env || 'prd' }}
       target_hosts: ${{ vars.TARGET_HOSTS || 'blizzard91' }}
     steps:
       # 特にすることはないがsteps必須のため
@@ -46,7 +46,7 @@ jobs:
           echo "value=$(echo "${{ needs.set-env.outputs.target_hosts }}" | jq -R 'split(",")' | jq -c)" >> $GITHUB_OUTPUT
 
   deploy:
-    needs: [gen-matrix,set-env]
+    needs: [set-env, gen-matrix]
     strategy:
       max-parallel: 1
       fail-fast: true

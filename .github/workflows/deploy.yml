@@ -1,0 +1,66 @@
+name: Deploy
+on:
+  # workflow_dispatchはデフォルトブランチに置くまで使えないので開発中の便宜
+  push:
+    branches:
+      - check-deploy-dev
+  workflow_dispatch:
+    inputs:
+      env:
+        type: environment
+        description: 'Target environment'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  #id-token: write
+  contents: read
+
+jobs:
+  set-env:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      deploy_env: ${{ github.event.inputs.env || 'dev' }}
+      target_hosts: ${{ vars.TARGET_HOSTS || 'blizzard91' }}
+    steps:
+      # 特にすることはないがsteps必須のため
+      - name: dummy
+        run: |
+          :
+
+  gen-matrix:
+    needs: [set-env]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment:
+      # environment.nameで使えるcontextが限定されているのとデフォルトブランチに置くまでworkflow_dispatchが使えないことに起因する回避
+      name: ${{ needs.set-env.outputs.deploy_env }}
+    outputs:
+      matrix: ${{ steps.gen-matrix.outputs.value }}
+    steps:
+      - id: gen-matrix
+        run: |
+            echo "value=$(echo "${{ needs.set-env.outputs.target_hosts }}" | jq -R '{host: split(",")}')" >> $GITHUB_OUTPUT
+
+  deploy:
+    needs: [gen-matrix]
+    strategy:
+      max-parallel: 1
+      fail-fast: true
+      matrix: ${{ fromJson(needs.gen-matrix.outputs.matrix) }}
+    runs-on: {{ matrix.host }}
+    concurrency:
+      group: ${{ needs.set-env.outputs.deploy_env }}
+      cancel-in-progress: false
+    environment:
+      name: ${{ needs.set-env.outputs.deploy_env }}
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: deploy to ${{ needs.set-env.outputs.deploy_env }} on ${{ matrix.host }}
+        run: |
+          echo BRANCH="${{ vars.BRANCH }}" ENV="${{ vars.ENV }}" ./deploy.sh

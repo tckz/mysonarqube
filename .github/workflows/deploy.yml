@@ -86,3 +86,5 @@ jobs:
         if: failure()
         run: |
           echo "Deploy failed on ${{ matrix.host }}"
+          echo "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+

@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy instead of jenkins
 on:
   push:
     branches:
@@ -36,13 +36,13 @@ jobs:
           else
             case "$GITHUB_REF_NAME" in
               staging)
-                echo "value=stg" >> $GITHUB_OUTPUT
+                echo "value=staging" >> $GITHUB_OUTPUT
                 ;;
               master)
-                echo "value=prd" >> $GITHUB_OUTPUT
+                echo "value=production" >> $GITHUB_OUTPUT
                 ;;
               *)
-                echo "value=dev" >> $GITHUB_OUTPUT
+                echo "value=development" >> $GITHUB_OUTPUT
                 ;;
             esac
           fi

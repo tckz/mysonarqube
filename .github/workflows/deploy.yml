@@ -24,7 +24,6 @@ jobs:
     timeout-minutes: 5
     outputs:
       deploy_env: ${{ github.event.inputs.env || 'prd' }}
-      target_hosts: ${{ vars.TARGET_HOSTS || 'blizzard91' }}
     steps:
       # 特にすることはないがsteps必須のため
       - name: dummy
@@ -39,19 +38,18 @@ jobs:
       # environment.nameで使えるcontextが限定されているのとデフォルトブランチに置くまでworkflow_dispatchが使えないことに起因する回避
       name: ${{ needs.set-env.outputs.deploy_env }}
     outputs:
-      host: ${{ steps.gen-matrix.outputs.value }}
+      matrix: ${{ steps.gen-matrix.outputs.value }}
     steps:
       - id: gen-matrix
         run: |
-          echo "value=$(echo "${{ needs.set-env.outputs.target_hosts }}" | jq -R 'split(",")' | jq -c)" >> $GITHUB_OUTPUT
+          echo "value=$(echo "${{ vars.TARGET_HOSTS }}" | jq -R '{"host": split(",")}' | jq -c)" >> $GITHUB_OUTPUT
 
   deploy:
     needs: [set-env, gen-matrix]
     strategy:
       max-parallel: 1
       fail-fast: true
-      matrix:
-        host: ${{ fromJson(needs.gen-matrix.outputs.host) }}
+      matrix: ${{ fromJson(needs.gen-matrix.outputs.matrix) }}
     runs-on: ${{ matrix.host }}
     concurrency:
       group: ${{ needs.set-env.outputs.deploy_env }}

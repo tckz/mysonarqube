@@ -84,7 +84,9 @@ jobs:
           exit 1
       - name: error notification
         if: failure()
-        run: |
-          echo "Deploy failed on ${{ matrix.host }}"
-          echo "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-
+        uses: ./github/actions/notify-teams
+        with:
+          text: |
+            Deploy ${{ github.repository }} failed on ${{ matrix.host }}
+            [${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}

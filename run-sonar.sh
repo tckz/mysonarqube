@@ -19,6 +19,6 @@ do
 	chmod a+w $p || exit 1
 done
 
-exec docker compose up
+exec docker compose up --pull always
 
 

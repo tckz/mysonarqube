@@ -1,6 +1,6 @@
 services:
   sonarqube:
-    image: sonarqube:25.1.0.102122-community
+    image: sonarqube:community
     container_name: sonarqube
     depends_on:
       - pgsql

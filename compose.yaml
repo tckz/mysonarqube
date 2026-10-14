@@ -12,12 +12,12 @@ services:
       - ./sonarqube/opt/sonarqube/extensions:/opt/sonarqube/extensions
       - ./sonarqube/opt/sonarqube/conf/sonar.properties:/opt/sonarqube/conf/sonar.properties
   pgsql:
-    image: postgres:11
+    image: postgres:18
     container_name: pgsql11
     environment:
       - POSTGRES_DB=sonar
       - POSTGRES_USER=sonar
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
-      - ./pgsql/var/lib/postgresql/data:/var/lib/postgresql/data
+      - ./pgsql/var/lib/postgresql18:/var/lib/postgresql/
       - ./pgsql/backup:/backup

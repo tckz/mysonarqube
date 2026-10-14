@@ -3,7 +3,8 @@ services:
     image: sonarqube:community
     container_name: sonarqube
     depends_on:
-      - pgsql
+      pgsql:
+        condition: service_healthy
     ports:
       - "9000:9000"
     volumes:
@@ -21,3 +22,9 @@ services:
     volumes:
       - ./pgsql/var/lib/postgresql18:/var/lib/postgresql/
       - ./pgsql/backup:/backup
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sonar -d sonar"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s

@@ -6,8 +6,6 @@ services:
       - pgsql
     ports:
       - "9000:9000"
-    environment:
-      - sonar.jdbc.url=jdbc:postgresql://pgsql/sonar
     volumes:
       - ./sonarqube/opt/sonarqube/data:/opt/sonarqube/data
       - ./sonarqube/opt/sonarqube/logs:/opt/sonarqube/logs
